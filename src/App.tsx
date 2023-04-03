@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/App.css';
+import { Tile, TilePosition, TileRotation, TileType } from './classes/tile';
 
 function App() {
 
@@ -8,22 +9,7 @@ function App() {
   const mapWidth = 8;
   const mapHeight = 5;
 
-  const calculatePlacement = (item: string, x: number, y: number) => {
-    // - - - - - - -
-    // - - - - - - -
-    // - - - - - - -
-    // - - - - - - -
-    // - - - - - - -
-
-    // for (var i = 0; i < mapWidth; i++) {
-    //   for (var j = 0; j < mapHeight; j++) {
-    //     var xPos: number = i * gridSize;
-    //     var yPos: number = j * gridSize;
-
-
-    //   }
-    // }
-  }
+  var tile: Tile = new Tile(TileType.CastleCenterSide);
 
   return (
     <>
