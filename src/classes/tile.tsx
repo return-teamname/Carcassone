@@ -42,6 +42,16 @@ enum TileType {
   RoadJunctionSmall = "0111",
 }
 
+function getRandomTileType(): TileType {
+  const tileTypes = Object.keys(TileType);
+  const randomIndex = Math.floor(Math.random() * tileTypes.length);
+  return tileTypes[randomIndex] as TileType;
+}
+
+function getTileValue(key: string): string | undefined {
+  return TileType[key as keyof typeof TileType];
+}
+
 enum TileRotation {
   Up = "0",
   Right = "1",
@@ -102,7 +112,6 @@ class Tile {
   getTileTop(): number {
     return this.getValidTileForSide(0);
   }
-
 }
 
 export {
@@ -110,4 +119,6 @@ export {
   TilePosition,
   TileRotation,
   Tile,
+  getRandomTileType,
+  getTileValue
 }
