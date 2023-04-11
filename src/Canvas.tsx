@@ -44,10 +44,10 @@ const GridCell = ({
     const left = currentTileMap[3];
 
     if (up != "4" && up != getValidTileForSide(currentTileKey as TileType, 0, rotation).toString()) valid = false;
-    if (right != "4" && right != getValidTileForSide(currentTileKey as TileType, 1, rotation).toString()) valid = false;
-    if (down != "4" && down != getValidTileForSide(currentTileKey as TileType, 2, rotation).toString()) valid = false;
-    if (left != "4" && left != getValidTileForSide(currentTileKey as TileType, 3, rotation).toString()) valid = false;
-  } else if(textures.size == 0) {
+    else if (right != "4" && right != getValidTileForSide(currentTileKey as TileType, 1, rotation).toString()) valid = false;
+    else if (down != "4" && down != getValidTileForSide(currentTileKey as TileType, 2, rotation).toString()) valid = false;
+    else if (left != "4" && left != getValidTileForSide(currentTileKey as TileType, 3, rotation).toString()) valid = false;
+  } else if (textures.size == 0) {
     valid = true;
   }
   //console.log(idx, "after", valid);
@@ -109,12 +109,13 @@ interface GridCanvasProps {
   tileMap: Map<number, string>;
   currentTileKey: TileType;
   points: Points;
+  validMoves: number;
   onPlaced: (pos: [number, number, number]) => void;
 }
 
-const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
+const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
   return (
-    <Canvas>
+    <Canvas camera={{ position: [0, 0, 10] }}>
       <OrbitControls />
       <pointLight position={[10, 10, 10]} />
       {Array.from({ length: width * height }, (_, idx) => {
@@ -135,42 +136,55 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, points, rotation
           />
         );
       })}
-      <Text
-        position={[3, 3, 0]}
-        scale={[0.5, 0.5, 0.5]}
-        color="black" // default
-        anchorX="left" // default
-        anchorY="middle" // default
-      >
-        Városért pontok: {points.cities}
-      </Text>
-      <Text
-        position={[3, 2, 0]}
-        scale={[0.5, 0.5, 0.5]}
-        color="black" // default
-        anchorX="left" // default
-        anchorY="middle" // default
-      >
-        Kolostorért pontok: {points.monas}
-      </Text>
-      <Text
-        position={[3, 1, 0]}
-        scale={[0.5, 0.5, 0.5]}
-        color="black" // default
-        anchorX="left" // default
-        anchorY="middle" // default
-      >
-        Utakért pontok: {points.roads}
-      </Text>
-      <Text
-        position={[3, 0, 0]}
-        scale={[0.5, 0.5, 0.5]}
-        color="black" // default
-        anchorX="left" // default
-        anchorY="middle" // default
-      >
-        Összesen: {points.roads + points.cities + points.monas}
-      </Text>
+      {
+        started ? <>
+          <Text
+            position={[3, 3, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black" // default
+            anchorX="left" // default
+            anchorY="middle" // default
+          >
+            Városért pontok: {points.cities}
+          </Text>
+          <Text
+            position={[3, 2, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black" // default
+            anchorX="left" // default
+            anchorY="middle" // default
+          >
+            Kolostorért pontok: {points.monas}
+          </Text>
+          <Text
+            position={[3, 1, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black" // default
+            anchorX="left" // default
+            anchorY="middle" // default
+          >
+            Utakért pontok: {points.roads}
+          </Text>
+          <Text
+            position={[3, 0, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black" // default
+            anchorX="left" // default
+            anchorY="middle" // default
+          >
+            Összesen: {points.roads + points.cities + points.monas}
+          </Text>
+          <Text
+            position={[3, -2, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black" // default
+            anchorX="left" // default
+            anchorY="middle" // default
+          >
+            Lehetséges lerakások: {validMoves == -1 ? width * height * 4 : validMoves}
+          </Text>
+        </> : null
+      }
     </Canvas>
   );
 };
