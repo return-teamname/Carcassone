@@ -1,55 +1,113 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { OrbitControls } from '@react-three/drei';
 
-const Canvas = (props: any) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const { tiles } = props
+const GridCell = ({
+  position,
+  started,
+  onClick,
+  texture,
+  textures,
+}: {
+  position: [number, number, number];
+  onClick: (pos: [number, number, number]) => void;
+  started: boolean;
+  texture: { imgSource: string, rotation: number } | undefined;
+  textures: Map<number, { imgSource: string, rotation: number }>;
+}) => {
+  const [hovered, setHover] = useState(false);
+  const [loadedTexture, setLoadedTexture] = useState<THREE.Texture | null>(null);
+  const mesh = useRef<THREE.Mesh>(null!);
 
   useEffect(() => {
-    if (canvasRef.current) {
-      const ctx = canvasRef.current.getContext("2d");
-      ctx!.strokeStyle = "black"
-      ctx!.lineWidth = 1
-      for (let x = 0; x < 5; x++) {
-        for (let y = 0; y < 8; y++) {
-          ctx?.strokeRect(100 * x + 10, 100 * y + 10, 100, 100)
+    if (texture) {
+      const loader = new THREE.TextureLoader();
+      loader.load(texture.imgSource, (tex) => {
+        tex.anisotropy = 16;
+        console.log("rotation", texture.rotation);
+        tex.rotation = (texture.rotation * -90 * Math.PI) / 180;
+        tex.center.set(0.5, 0.5);
+        setLoadedTexture(tex);
+        if (mesh.current && mesh.current.material instanceof THREE.Material) {
+          mesh.current.material.needsUpdate = true;
         }
+      });
+    } else {
+      setLoadedTexture(null);
+      if (mesh.current && mesh.current.material instanceof THREE.Material) {
+        mesh.current.material.needsUpdate = true;
       }
     }
-  }, [tiles]);
+  }, [texture, textures]);
 
-  const placeTile = (canvasRef: any, event: any) => {
-    const rect = canvasRef.getBoundingClientRect()
-    const ctx = canvasRef.getContext("2d");
-    const x = Math.floor((event.clientX - rect.left - 10) / 100)
-    const y = Math.floor((event.clientY - rect.top - 10) / 100)
-
-    if (props.imgurl !== "") {
-      const image = new Image()
-      image.src = props.imgurl[0]
-
-      console.log(image)
-      image.onload = () => {
-        ctx.save()
-        ctx.translate(x * 100 + 60, y * 100 + 60); // move to center of the cell
-
-        ctx.rotate(props.rotate[0] * Math.PI / 180)
-        ctx.drawImage(image, -50, -50, 100, 100) // draw image centered
-        ctx.restore()
+  useFrame(() => {
+    if (mesh.current) {
+      if (hovered) {
+        mesh.current.material = new THREE.MeshStandardMaterial({ color: "green" });
+      } else if (loadedTexture) {
+        mesh.current.material = new THREE.MeshStandardMaterial({ map: loadedTexture, color: 0xFFFFFF, transparent: false });
+      } else {
+        mesh.current.material = new THREE.MeshStandardMaterial({ color: 'white' });
       }
-
-      props.imgurl[1]("")
-      props.rotate[1](90)
     }
-  }
+  });
+
+  const handlePointerOver = () => started && !texture ? setHover(true) : null;
+  const handlePointerOut = () => started ? setHover(false) : null;
+  const handleClick = () => {
+    if (!started) return;
+    onClick(position);
+    setHover(false);
+  };
 
   return (
-    <canvas
-      ref={canvasRef}
-      {...props}
-      onClick={(event) => placeTile(canvasRef.current, event)}
-    />
+    <mesh position={position} ref={mesh} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut} onClick={handleClick}>
+      <planeBufferGeometry attach="geometry" args={[1, 1]} />
+      <meshBasicMaterial attach="material" color="white" />
+    </mesh>
   );
 };
 
-export default Canvas
+interface GridCanvasProps {
+  imgSource: string;
+  rotation: number;
+  started: boolean;
+  tiles: Map<number, { imgSource: string, rotation: number }>;
+  onPlaced: (idx: number) => void;
+}
+
+const GridCanvas: React.FC<GridCanvasProps> = ({ onPlaced, tiles, imgSource, rotation, started }) => {
+  const width = 5;
+  const height = 8;
+
+  const handleClick = (pos: [number, number, number]) => {
+    const i = Math.round(pos[0] + (width - 1) / 2);
+    const j = Math.round(pos[1] + (height - 1) / 2);
+    const idx = i + j * width;
+    onPlaced(idx);
+  };
+
+  return (
+    <Canvas>
+      <OrbitControls />
+      <pointLight position={[10, 10, 10]} />
+      {Array.from({ length: width * height }, (_, idx) => {
+        const i = idx % width - (width - 1) / 2;
+        const j = Math.floor(idx / width) - (height - 1) / 2;
+        return (
+          <GridCell
+            key={`${i}-${j}`}
+            position={[i, j, 0]}
+            started={started}
+            onClick={handleClick}
+            texture={tiles.get(idx)}
+            textures={tiles}
+          />
+        );
+      })}
+    </Canvas>
+  );
+};
+
+export default GridCanvas;

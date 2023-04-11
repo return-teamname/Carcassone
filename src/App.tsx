@@ -1,60 +1,61 @@
 import { useState, useRef } from 'react';
 import './css/App.css';
 import { Tile, TilePosition, TileRotation, TileType, getRandomTileType, getTileValue } from './classes/tile';
-import Canvas from './Canvas';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRotate } from '@fortawesome/free-solid-svg-icons';
+import NewGridCanvas from './Canvas';
 
 function App(): JSX.Element {
-  const [randomTileButtonText, setRandomTileButtonText] = useState("Játék elkezdése")
-  const [tiles, setTiles] = useState<Tile[]>([])
+  const [started, setStarted] = useState(false);
   const [imgSource, setImgSource] = useState("")
-  const [rotate, setRotate] = useState(90)
+  const [rotate, setRotate] = useState(0);
+
+  const [tiles, setTiles] = useState<Map<number, { imgSource: string, rotation: number }>>(new Map);
+
+  const startGame = () => {
+    setStarted(true);
+    getRandomTile();
+  }
 
   const getRandomTile = () => {
-    if (randomTileButtonText == "Játék elkezdése") {
-      setRandomTileButtonText("Új kártya")
-    }
-
+    setRotate(0);
     let randomTileKey: TileType = getRandomTileType()
 
-    let tile: Tile = new Tile(randomTileKey);
-
-    setTiles(prevTiles => [...prevTiles, tile])
-
     const imgUrl = require(`./assets/tiles/${randomTileKey}.png`)
-    setImgSource(imgUrl)
-
+    setImgSource(imgUrl);
+    console.log("imgsource:", imgSource);
   }
 
   const imgRotation = (event: any) => {
-    if (rotate + 90 >= 360) {
+    if (rotate >= 3) {
       setRotate(0)
     } else {
-      setRotate(rotate + 90)
+      setRotate(rotate + 1)
     }
-    event.target.style.transform = `rotate(${rotate}deg)`
-    console.log(event.target)
+    event.target.style.transform = `rotate(${(rotate + 1) * 90}deg)`
   }
 
-  // map variables
-  const gridSize = 100;
-  const mapWidth = 5;
-  const mapHeight = 8;
+  const onPlaced = (idx: number) => {
+    const newTiles = new Map(tiles);
+    newTiles.set(idx, {
+      imgSource,
+      rotation: rotate,
+    });
+    setTiles(newTiles);
+    getRandomTile();
+  }
 
   return (
-    <>
-      <section className="menu">
-        <h1>Carcassone</h1>
-        <button onClick={getRandomTile}>{randomTileButtonText}</button>
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <div style={{ width: '100vw', height: '100vh' }}>
+        <NewGridCanvas onPlaced={onPlaced} started={started} imgSource={imgSource} rotation={rotate} tiles={tiles} />
+      </div>
+      <div style={{ position: "fixed", backgroundColor: "#0000005A", bottom: 0, width: "100%", padding: "12px", display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={startGame}>{started ? <FontAwesomeIcon icon={faRotate} /> : "Indítás"}</button>
         {imgSource && <div><img src={imgSource} className='previewImage' onClick={(event: any) => imgRotation(event)} /></div>}
-      </section>
-      <Canvas 
-        width={gridSize * mapWidth + 20}
-        height={gridSize * mapHeight + 20}
-        className="canvas"
-        tiles={tiles}
-        imgurl={[imgSource, setImgSource]}
-        rotate={[rotate-90, setRotate]} />
-    </>
+      </div>
+    </div>
   );
 }
 
