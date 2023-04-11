@@ -28,12 +28,9 @@ function App(): JSX.Element {
   }
 
   const imgRotation = (event: any) => {
-    if (rotate >= 3) {
-      setRotate(0)
-    } else {
-      setRotate(rotate + 1)
-    }
-    event.target.style.transform = `rotate(${(rotate + 1) * 90}deg)`
+    var newRotation = rotate >= 3 ? 0 : rotate + 1;
+    setRotate(newRotation);
+    event.target.style.transform = `rotate(${newRotation * 90}deg)`
   }
 
   const onPlaced = (idx: number) => {

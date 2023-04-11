@@ -56,7 +56,7 @@ const GridCell = ({
   const handlePointerOver = () => started && !texture ? setHover(true) : null;
   const handlePointerOut = () => started ? setHover(false) : null;
   const handleClick = () => {
-    if (!started) return;
+    if (!started || texture) return;
     onClick(position);
     setHover(false);
   };
