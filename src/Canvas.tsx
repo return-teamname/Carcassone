@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 const Canvas = (props: any) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    const { tiles } = props 
+    const { tiles } = props
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -18,10 +18,38 @@ const Canvas = (props: any) => {
         }
     }, [tiles]);
 
+    const placeTile = (canvasRef: any, event: any) => {
+        const rect = canvasRef.getBoundingClientRect()
+        const ctx = canvasRef.getContext("2d");
+        const x = Math.floor((event.clientX - rect.left - 10) / 100)
+        const y = Math.floor((event.clientY - rect.top - 10) / 100)
+
+        if(props.imgurl !== ""){
+            const image = new Image()
+            image.src = props.imgurl[0]
+    
+            console.log(image)
+            image.onload = () => {
+                // forgatás nem működik
+                ctx.save()
+                ctx.translate(x + 100 / 2, y + 100 / 2)
+                ctx.rotate(props.rotate[0] * Math.PI / 180)
+                ctx.drawImage(image, 100*x + 10 - x - 100 / 2, 100*y + 10 - x - 100 / 2, 100, 100)
+                ctx.restore()
+            }
+    
+            props.imgurl[1]("")
+            props.rotate[1](90)
+        }
+
+
+    }
+
     return (
         <canvas
             ref={canvasRef}
             {...props}
+            onClick={(event) => placeTile(canvasRef.current, event)}
         />
     );
 };

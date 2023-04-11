@@ -19,20 +19,20 @@ function App(): JSX.Element {
     let tile: Tile = new Tile(randomTileKey);
 
     setTiles(prevTiles => [...prevTiles, tile])
-    
+
     const imgUrl = require(`./assets/tiles/${randomTileKey}.png`)
     setImgSource(imgUrl)
 
   }
 
   const imgRotation = (event: any) => {
-    if(rotate + 90 == 360){
+    if (rotate + 90 >= 360) {
       setRotate(0)
     } else {
       setRotate(rotate + 90)
     }
     event.target.style.transform = `rotate(${rotate}deg)`
-    console.log(event.target.style.transform)
+    console.log(event.target)
   }
 
   // map variables
@@ -45,9 +45,15 @@ function App(): JSX.Element {
       <section className="menu">
         <h1>Carcassone</h1>
         <button onClick={getRandomTile}>{randomTileButtonText}</button>
-        { imgSource && <div><img src={imgSource} className='previewImage' onClick={(event: any) => imgRotation(event)} /></div> }
+        {imgSource && <div><img src={imgSource} className='previewImage' onClick={(event: any) => imgRotation(event)} /></div>}
       </section>
-      <Canvas width={gridSize * mapWidth + 20} height={gridSize * mapHeight + 20} className="canvas" tiles={tiles} />
+      <Canvas 
+        width={gridSize * mapWidth + 20}
+        height={gridSize * mapHeight + 20}
+        className="canvas"
+        tiles={tiles}
+        imgurl={[imgSource, setImgSource]}
+        rotate={[rotate-90, setRotate]} />
     </>
   );
 }
