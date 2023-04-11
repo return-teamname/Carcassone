@@ -3,6 +3,7 @@ enum TileTypeIndex {
   Road = "1", // ut
   Castle = "2", // varos
   Monastery = "3", // kolostor
+  Anything = "4",
 }
 
 enum TileType {
@@ -53,10 +54,10 @@ function getTileValue(key: string): string | undefined {
 }
 
 enum TileRotation {
-  Up = "0",
-  Right = "1",
-  Down = "2",
-  Left = "3"
+  Up = 0,
+  Right = 1,
+  Down = 2,
+  Left = 3
 }
 
 class TilePosition {
@@ -71,6 +72,24 @@ class TilePosition {
   }
 }
 
+const calculateIdx = (x: number, y: number, width: number = 5, height: number = 8): number => {
+  const idx = x + y * width;
+  return idx;
+}
+
+const getSideByIndex = (index: number) => {
+  if (index < 0) {
+    return index + 4;
+  }
+  return index;
+}
+
+const getValidTileForSide = (type: TileType, side: number, rotation: number): number => {
+  var index = side - rotation;
+  var sideByIndex = getSideByIndex(index);
+  return parseInt(Object.values(TileType)[Object.keys(TileType).indexOf(type)][sideByIndex]);
+}
+
 class Tile {
   type: TileType;
   pos: TilePosition = new TilePosition(0, 0, TileRotation.Up);
@@ -80,37 +99,36 @@ class Tile {
     this.pos = pos ?? this.pos;
   }
 
+  getIdx(width: number = 5, height: number = 8): number {
+    return calculateIdx(this.pos.x, this.pos.y, width = width, height = height);
+  }
+
+  getImage(): string {
+    return require(`../assets/tiles/${this.type}.png`);
+  }
+
   getRotation(): TileRotation {
     return this.pos.rot;
   }
 
-  getSideByIndex(index: number) {
-    if (index < 0) {
-      return index + 4;
-    }
-    return index;
-  }
-
-  getValidTileForSide(side: number): number {
-    var index = side - parseInt(this.pos.rot);
-    var sideByIndex = this.getSideByIndex(index);
-    return parseInt(this.type[sideByIndex]);
+  getValidTileFor(side: number): number {
+    return getValidTileForSide(this.type, side, this.pos.rot);
   }
 
   getTileRight(): number {
-    return this.getValidTileForSide(1);
+    return this.getValidTileFor(1);
   }
 
   getTileLeft(): number {
-    return this.getValidTileForSide(3);
+    return this.getValidTileFor(3);
   }
 
   getTileBottom(): number {
-    return this.getValidTileForSide(2);
+    return this.getValidTileFor(2);
   }
 
   getTileTop(): number {
-    return this.getValidTileForSide(0);
+    return this.getValidTileFor(0);
   }
 }
 
@@ -120,5 +138,7 @@ export {
   TileRotation,
   Tile,
   getRandomTileType,
-  getTileValue
+  getTileValue,
+  calculateIdx,
+  getValidTileForSide
 }
