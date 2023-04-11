@@ -141,45 +141,54 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, poin
           <Text
             position={[3, 3, 0]}
             scale={[0.5, 0.5, 0.5]}
-            color="black" // default
-            anchorX="left" // default
-            anchorY="middle" // default
+            color="black"
+            anchorX="left"
+            anchorY="middle"
           >
             Városért pontok: {points.cities}
           </Text>
           <Text
             position={[3, 2, 0]}
             scale={[0.5, 0.5, 0.5]}
-            color="black" // default
-            anchorX="left" // default
-            anchorY="middle" // default
+            color="black"
+            anchorX="left"
+            anchorY="middle"
           >
             Kolostorért pontok: {points.monas}
           </Text>
           <Text
             position={[3, 1, 0]}
             scale={[0.5, 0.5, 0.5]}
-            color="black" // default
-            anchorX="left" // default
-            anchorY="middle" // default
+            color="black"
+            anchorX="left"
+            anchorY="middle"
           >
             Utakért pontok: {points.roads}
           </Text>
           <Text
             position={[3, 0, 0]}
             scale={[0.5, 0.5, 0.5]}
-            color="black" // default
-            anchorX="left" // default
-            anchorY="middle" // default
+            color="black"
+            anchorX="left"
+            anchorY="middle"
           >
-            Összesen: {points.roads + points.cities + points.monas}
+            Egyéb pontok: {points.others}
           </Text>
           <Text
-            position={[3, -2, 0]}
+            position={[3, -1, 0]}
             scale={[0.5, 0.5, 0.5]}
-            color="black" // default
-            anchorX="left" // default
-            anchorY="middle" // default
+            color="black"
+            anchorX="left"
+            anchorY="middle"
+          >
+            Összesen: {points.roads + points.cities + points.monas + points.others}
+          </Text>
+          <Text
+            position={[3, -3, 0]}
+            scale={[0.5, 0.5, 0.5]}
+            color="black"
+            anchorX="left"
+            anchorY="middle"
           >
             Lehetséges lerakások: {validMoves == -1 ? width * height * 4 : validMoves}
           </Text>

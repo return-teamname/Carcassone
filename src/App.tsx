@@ -10,6 +10,7 @@ export interface Points {
   cities: number;
   monas: number;
   roads: number;
+  others: number;
 }
 
 function App(): JSX.Element {
@@ -26,7 +27,7 @@ function App(): JSX.Element {
 
   const [tiles, setTiles] = useState<Map<number, Tile>>(new Map);
 
-  const [points, setPoints] = useState<Points>({ cities: 0, monas: 0, roads: 0 });
+  const [points, setPoints] = useState<Points>({ cities: 0, monas: 0, roads: 0, others: 0 });
   const [validMoves, setValidMoves] = useState(-1);
 
   const startGame = () => {
@@ -34,7 +35,7 @@ function App(): JSX.Element {
     setValidMoves(0);
     setImgSource("");
     setRotate(0);
-    setPoints({cities: 0, monas: 0, roads: 0});
+    setPoints({ cities: 0, monas: 0, roads: 0, others: 0 });
     setCurrentTileKey(undefined);
     setTiles(new Map);
     setValidTileMap(new Map);
@@ -73,14 +74,16 @@ function App(): JSX.Element {
     const newTileKey = getRandomTile();
     const newValidMoves = countValidMoves(newTiles, newTileMap, newTileKey);
 
-    if (newValidMoves == 0) {
+    if (newTiles.size == width * height) setPoints({ cities: points.cities, monas: points.monas, roads: points.roads, others: points.others + 10 });
+
+    if (newValidMoves == 0 || newTiles.size == width * height) {
       setStarted(false);
     }
   }
 
   const countPoints = (newTiles: Map<number, Tile>) => {
     const arr = Array.from(newTiles.values());
-    const cities = arr.filter(e => e.type.startsWith("Castle")).length;
+    const cities = arr.filter(e => e.type.startsWith("Castle")).length * 2;
     var monas = 0;
     arr.filter(e => e.type.startsWith("Monastery")).forEach(tile => {
       if (tile.pos.x < 4 && newTiles.get(calculateIdx(tile.pos.x + 1, tile.pos.y))) monas += 1;
@@ -89,8 +92,9 @@ function App(): JSX.Element {
       if (tile.pos.y > 0 && newTiles.get(calculateIdx(tile.pos.x, tile.pos.y - 1))) monas += 1;
     });
     const roads = arr.filter(e => e.type.startsWith("Road") || e.type.endsWith("Road")).length;
+    const others = 0;
 
-    setPoints({ cities, monas, roads });
+    setPoints({ cities, monas, roads, others });
   }
 
   const checkValidTiles = (newTiles: Map<number, Tile>) => {
