@@ -1,11 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
-* {
-    background:  rgba(60,132,206);
-}
-
 html, body {
-    height: 100%;
+    min-height: 100%;
 }
 
 body{
@@ -13,12 +9,17 @@ body{
     display: flex;
     flex-direction: column;
     color: #eee;
-    
+    background: linear-gradient(112.1deg, rgb(32, 38, 57) 11.4%, rgb(63, 76, 119) 70.2%); 
 }
 
 a {
     margin: 30px;
+    font-size: 24px;
     color: #ffffff;
+}
+
+h1{
+    font-size: 52px;
 }
 
 a:hover {
@@ -26,15 +27,13 @@ a:hover {
 }
 
 header {
-    display: flex;
     margin: 20px;
-    
 }
 
 header nav {
     display: flex;
-    flex-basis: 100%;
     justify-content: space-evenly;
+    align-items: center;
     
 }
 
@@ -58,4 +57,24 @@ div {
 }
 footer{
     flex-shrink: 0;
+}
+
+ul li{
+    list-style: none;
+    display: block;
+    width: 80%;
+    background-color: rgba(0,0,0,.5);
+    text-align: center;
+    padding: 20px;
+    margin: 15px auto;
+    border-radius: 15px;
+    font-size: 20px;
+}
+
+h2{
+    font-size: 34px;
+}
+
+p{
+    font-size: 20px;
 }
