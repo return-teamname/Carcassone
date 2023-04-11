@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import { OrbitControls } from '@react-three/drei';
 import { Tile, TileType, getValidTileForSide } from './classes/tile';
 
+import { Text } from '@react-three/drei';
+import { Points } from './App';
+
 const GridCell = ({
   position,
   started,
@@ -32,8 +35,6 @@ const GridCell = ({
   const currentTileMap = tileMap.get(idx);
   const currentTileValue = Object.values(TileType)[Object.keys(TileType).indexOf(currentTileKey)];
 
-  console.log(textures);
-
   var valid = currentTileMap != null;
   //console.log(idx, "before", valid);
   if (currentTileMap) {
@@ -47,7 +48,6 @@ const GridCell = ({
     if (down != "4" && down != getValidTileForSide(currentTileKey as TileType, 2, rotation).toString()) valid = false;
     if (left != "4" && left != getValidTileForSide(currentTileKey as TileType, 3, rotation).toString()) valid = false;
   } else if(textures.size == 0) {
-    console.log("valid because textures length was 0");
     valid = true;
   }
   //console.log(idx, "after", valid);
@@ -108,10 +108,11 @@ interface GridCanvasProps {
   tiles: Map<number, Tile>;
   tileMap: Map<number, string>;
   currentTileKey: TileType;
+  points: Points;
   onPlaced: (pos: [number, number, number]) => void;
 }
 
-const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
+const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
   return (
     <Canvas>
       <OrbitControls />
@@ -134,6 +135,42 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, rotation, tileMa
           />
         );
       })}
+      <Text
+        position={[3, 3, 0]}
+        scale={[0.5, 0.5, 0.5]}
+        color="black" // default
+        anchorX="left" // default
+        anchorY="middle" // default
+      >
+        Városért pontok: {points.cities}
+      </Text>
+      <Text
+        position={[3, 2, 0]}
+        scale={[0.5, 0.5, 0.5]}
+        color="black" // default
+        anchorX="left" // default
+        anchorY="middle" // default
+      >
+        Kolostorért pontok: {points.monas}
+      </Text>
+      <Text
+        position={[3, 1, 0]}
+        scale={[0.5, 0.5, 0.5]}
+        color="black" // default
+        anchorX="left" // default
+        anchorY="middle" // default
+      >
+        Utakért pontok: {points.roads}
+      </Text>
+      <Text
+        position={[3, 0, 0]}
+        scale={[0.5, 0.5, 0.5]}
+        color="black" // default
+        anchorX="left" // default
+        anchorY="middle" // default
+      >
+        Összesen: {points.roads + points.cities + points.monas}
+      </Text>
     </Canvas>
   );
 };

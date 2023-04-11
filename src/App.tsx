@@ -6,10 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotate } from '@fortawesome/free-solid-svg-icons';
 import NewGridCanvas from './Canvas';
 
-interface tileInfo {
-  source: string;
-  rotation: number;
-  type: TileType;
+export interface Points {
+  cities: number;
+  monas: number;
+  roads: number;
 }
 
 function App(): JSX.Element {
@@ -25,6 +25,8 @@ function App(): JSX.Element {
   const [validTileMap, setValidTileMap] = useState<Map<number, string>>(new Map);
 
   const [tiles, setTiles] = useState<Map<number, Tile>>(new Map);
+
+  const [points, setPoints] = useState<Points>({ cities: 0, monas: 0, roads: 0 });
 
   const startGame = () => {
     setStarted(true);
@@ -56,9 +58,26 @@ function App(): JSX.Element {
     newTiles.set(idx, new Tile(currentTileKey as TileType, new TilePosition(x, y, rotate)));
 
     setTiles(newTiles);
-    console.log("tiles:", tiles);
+
     checkValidTiles(newTiles);
+    countPoints(newTiles);
+
     getRandomTile();
+  }
+
+  const countPoints = (newTiles: Map<number, Tile>) => {
+    const arr = Array.from(newTiles.values());
+    const cities = arr.filter(e => e.type.startsWith("Castle")).length;
+    var monas = 0;
+    arr.filter(e => e.type.startsWith("Monastery")).forEach(tile => {
+      if (tile.pos.x < 4 && newTiles.get(calculateIdx(tile.pos.x + 1, tile.pos.y))) monas += 1;
+      if (tile.pos.x > 0 && newTiles.get(calculateIdx(tile.pos.x - 1, tile.pos.y))) monas += 1;
+      if (tile.pos.y < 7 && newTiles.get(calculateIdx(tile.pos.x, tile.pos.y + 1))) monas += 1;
+      if (tile.pos.y > 0 && newTiles.get(calculateIdx(tile.pos.x, tile.pos.y - 1))) monas += 1;
+    });
+    const roads = arr.filter(e => e.type.startsWith("Road") || e.type.endsWith("Road")).length;
+
+    setPoints({ cities, monas, roads });
   }
 
   const checkValidTiles = (newTiles: Map<number, Tile>) => {
@@ -103,7 +122,7 @@ function App(): JSX.Element {
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <div style={{ width: '100vw', height: '100vh' }}>
-        <NewGridCanvas currentTileKey={currentTileKey!} tileMap={validTileMap} width={width} height={height} onPlaced={onPlaced} started={started} rotation={rotate} tiles={tiles} />
+        <NewGridCanvas points={points} currentTileKey={currentTileKey!} tileMap={validTileMap} width={width} height={height} onPlaced={onPlaced} started={started} rotation={rotate} tiles={tiles} />
       </div>
       <div style={{ position: "fixed", backgroundColor: "#0000005A", bottom: 0, width: "100%", padding: "12px", display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
         <button onClick={startGame}>{started ? <FontAwesomeIcon icon={faRotate} /> : "Indítás"}</button>
