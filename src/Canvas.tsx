@@ -1,11 +1,62 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls } from '@react-three/drei';
+import { Box, OrbitControls } from '@react-three/drei';
 import { Tile, TileType, getValidTileForSide } from './classes/tile';
 
-import { Text } from '@react-three/drei';
 import { Points } from './App';
+
+import { TextureLoader } from "three";
+
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import montserrat from './assets/fonts/montserrat.json';
+
+import { extend, Object3DNode } from "@react-three/fiber";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
+extend({ TextGeometry });
+
+declare module "@react-three/fiber" {
+  interface ThreeElements {
+    textGeometry: Object3DNode<TextGeometry, typeof TextGeometry>;
+  }
+}
+
+interface TextProps {
+  text: string;
+  position: [number, number, number];
+}
+
+const Text: React.FC<TextProps> = ({ text, position }) => {
+  const font = new FontLoader().parse(montserrat);
+
+  return (
+    <mesh position={position}>
+      <textGeometry args={[text, { font, size: 0.5, height: 0.05, curveSegments: 12, bevelEnabled: true, bevelThickness: .05, bevelSize: .03, bevelOffset: 0, bevelSegments: 1 }]} />
+      <meshLambertMaterial attach='material' color={'gold'} />
+    </mesh>
+  )
+}
+
+interface BackgroundProps {
+  imageUrl: string;
+}
+
+const Background: React.FC<BackgroundProps> = ({ imageUrl }) => {
+  const { scene } = useThree();
+  const texture = useLoader(TextureLoader, imageUrl);
+
+  useEffect(() => {
+    if (texture) {
+      scene.background = texture;
+    }
+    return () => {
+      scene.background = null;
+    };
+  }, [scene, texture]);
+
+  return null;
+};
+
 
 const GridCell = ({
   position,
@@ -33,7 +84,6 @@ const GridCell = ({
   const mesh = useRef<THREE.Mesh>(null!);
 
   const currentTileMap = tileMap.get(idx);
-  const currentTileValue = Object.values(TileType)[Object.keys(TileType).indexOf(currentTileKey)];
 
   var valid = currentTileMap != null;
   //console.log(idx, "before", valid);
@@ -78,6 +128,8 @@ const GridCell = ({
         mesh.current.material = new THREE.MeshStandardMaterial({ color: "green" });
       } else if (loadedTexture) {
         mesh.current.material = new THREE.MeshStandardMaterial({ map: loadedTexture, color: 0xFFFFFF, transparent: false });
+      } else if (valid) {
+        mesh.current.material = new THREE.MeshStandardMaterial({ color: 'lightgreen' });
       } else {
         mesh.current.material = new THREE.MeshStandardMaterial({ color: 'white' });
       }
@@ -114,10 +166,22 @@ interface GridCanvasProps {
 }
 
 const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
+
+  const backgroundImageUrl = require("./assets/bg/carsonne_bg.jpeg");
+
   return (
     <Canvas camera={{ position: [0, 0, 10] }}>
+      <React.Suspense fallback={null}>
+        <Background imageUrl={backgroundImageUrl} />
+      </React.Suspense>
       <OrbitControls />
-      <pointLight position={[10, 10, 10]} />
+      <pointLight position={[-10, 10, -5]} />
+      <pointLight position={[10, -10, 5]} />
+      <Box material={new THREE.MeshStandardMaterial({ color: 0x70351d })} position={[width, 0, -.6]} scale={[width * 3 + 2, height + 2, 1]} />
+      <Box material={new THREE.MeshStandardMaterial({ color: 0x70351d })} position={[width * 2 + 2.5, height / 2, -5]} scale={[1, 1, 8]} />
+      <Box material={new THREE.MeshStandardMaterial({ color: 0x70351d })} position={[-2.5, height / 2, -5]} scale={[1, 1, 8]} />
+      <Box material={new THREE.MeshStandardMaterial({ color: 0x70351d })} position={[width * 2 + 2.5, - height / 2, -5]} scale={[1, 1, 8]} />
+      <Box material={new THREE.MeshStandardMaterial({ color: 0x70351d })} position={[- 2.5, - height / 2, -5]} scale={[1, 1, 8]} />
       {Array.from({ length: width * height }, (_, idx) => {
         const i = idx % width - (width - 1) / 2;
         const j = Math.floor(idx / width) - (height - 1) / 2;
@@ -139,59 +203,29 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, poin
       {
         started ? <>
           <Text
-            position={[3, 3, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Városért pontok: {points.cities}
-          </Text>
+            position={[3.5, 3, 0]}
+            text={`Városokért pontok: ${points.cities}`}
+          />
           <Text
-            position={[3, 2, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Kolostorért pontok: {points.monas}
-          </Text>
+            position={[3.5, 2, 0]}
+            text={`Kolostorokért pontok: ${points.monas}`}
+          />
           <Text
-            position={[3, 1, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Utakért pontok: {points.roads}
-          </Text>
+            position={[3.5, 1, 0]}
+            text={`Utakért pontok: ${points.roads}`}
+          />
           <Text
-            position={[3, 0, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Egyéb pontok: {points.others}
-          </Text>
+            position={[3.5, 0, 0]}
+            text={`Egyéb pontok: ${points.others}`}
+          />
           <Text
-            position={[3, -1, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Összesen: {points.roads + points.cities + points.monas + points.others}
-          </Text>
+            position={[3.5, -1, 0]}
+            text={`Összesen: ${points.roads + points.cities + points.monas + points.others}`}
+          />
           <Text
-            position={[3, -3, 0]}
-            scale={[0.5, 0.5, 0.5]}
-            color="black"
-            anchorX="left"
-            anchorY="middle"
-          >
-            Lehetséges lerakások: {validMoves == -1 ? width * height * 4 : validMoves}
-          </Text>
+            position={[3.5, -3, 0]}
+            text={`Lehetséges lerakások: ${validMoves == -1 ? width * height * 4 : validMoves}`}
+          />
         </> : null
       }
     </Canvas>

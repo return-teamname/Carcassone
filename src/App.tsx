@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './css/App.css';
 import { Tile, TilePosition, TileRotation, TileType, calculateIdx, getRandomTileType, getTileValue, getValidTileForSide } from './classes/tile';
 
@@ -13,10 +13,58 @@ export interface Points {
   others: number;
 }
 
+export interface SavedGame {
+  username: string;
+  points: Points;
+  tiles: string;
+}
+
 function App(): JSX.Element {
   const width = 5;
   const height = 8;
 
+  // saving
+  const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
+  const [currentGame, setCurrentGame] = useState<SavedGame>();
+
+  const saveCurrentGame = (cGame: SavedGame) => {
+    setCurrentGame(cGame);
+    console.log("saving game", cGame, JSON.stringify(cGame));
+    localStorage.setItem('current_save', JSON.stringify(cGame));
+  }
+
+  const saveToGames = (cGame: SavedGame) => {
+    const cSave = [...savedGames, cGame];
+    setSavedGames(cSave);
+    console.log("saving to games", cSave, savedGames);
+    localStorage.setItem('saved_games', JSON.stringify(cSave));
+  }
+
+  useEffect(() => {
+    const cSavedGames = localStorage.getItem('saved_games');
+    if (cSavedGames) {
+      console.log("loading all saved games");
+      setSavedGames(JSON.parse(cSavedGames));
+    }
+
+    const currentSave = localStorage.getItem('current_save');
+    if (currentSave) {
+      startGame();
+      const p = JSON.parse(currentSave);
+      var s = new Map<number, Tile>();
+      const values = Object.values(JSON.parse(p.tiles));
+      console.log(values);
+      Object.keys(JSON.parse(p.tiles)).forEach((key, value) => {
+        s.set(parseInt(key), new Tile((values[value] as Tile).type, (values[value] as Tile).pos));
+      });
+      setTiles(s);
+      setPoints(p.points);
+      setCurrentGame(JSON.parse(currentSave));
+      makeCheck(s);
+    }
+  }, []);
+
+  //others
   const [started, setStarted] = useState(false);
 
   const [imgSource, setImgSource] = useState("")
@@ -40,6 +88,7 @@ function App(): JSX.Element {
     setTiles(new Map);
     setValidTileMap(new Map);
     getRandomTile();
+    localStorage.removeItem('current_save');
   }
 
   const getRandomTile = () => {
@@ -58,6 +107,43 @@ function App(): JSX.Element {
     //event.target.style.transform = `rotate(${newRotation * 90}deg)`
   }
 
+  const makeCheck = (newTiles: Map<number, Tile>) => {
+    const p = countPoints(newTiles);
+
+    const newTileMap = checkValidTiles(newTiles);
+    const newTileKey = getRandomTile();
+    const newValidMoves = countValidMoves(newTiles, newTileMap, newTileKey);
+
+    var currPoints = { cities: p.cities, monas: p.monas, roads: p.roads, others: p.others };
+
+    if (newTiles.size == width * height) {
+      currPoints = { cities: points.cities, monas: points.monas, roads: points.roads, others: points.others + 10 }
+    }
+
+    setPoints(currPoints);
+
+    var cGame = {
+      username: "",
+      points: currPoints,
+      tiles: JSON.stringify(Object.fromEntries(newTiles)),
+    }
+
+    if (newValidMoves == 0 || newTiles.size == width * height) {
+      setTimeout(() => {
+        const name = prompt("A Játék véget ért, mentéshez írd be a neved, ha nem szeretnéd menteni, hagyd üresen");
+        if (name != "") {
+          cGame.username = name!;
+        }
+        setStarted(false);
+      }, 1000)
+    }
+
+    saveCurrentGame(cGame);
+    if (cGame.username != "") {
+      saveToGames(cGame);
+    };
+  }
+
   const onPlaced = (pos: [number, number, number]) => {
     const x = pos[0] + 2;
     const y = pos[1] + 3.5;
@@ -68,17 +154,7 @@ function App(): JSX.Element {
     newTiles.set(idx, new Tile(currentTileKey as TileType, new TilePosition(x, y, rotate)));
 
     setTiles(newTiles);
-    countPoints(newTiles);
-
-    const newTileMap = checkValidTiles(newTiles);
-    const newTileKey = getRandomTile();
-    const newValidMoves = countValidMoves(newTiles, newTileMap, newTileKey);
-
-    if (newTiles.size == width * height) setPoints({ cities: points.cities, monas: points.monas, roads: points.roads, others: points.others + 10 });
-
-    if (newValidMoves == 0 || newTiles.size == width * height) {
-      setStarted(false);
-    }
+    makeCheck(newTiles);
   }
 
   const countPoints = (newTiles: Map<number, Tile>) => {
@@ -94,7 +170,8 @@ function App(): JSX.Element {
     const roads = arr.filter(e => e.type.startsWith("Road") || e.type.endsWith("Road")).length;
     const others = 0;
 
-    setPoints({ cities, monas, roads, others });
+    //setPoints({ cities, monas, roads, others });
+    return { cities, monas, roads, others };
   }
 
   const checkValidTiles = (newTiles: Map<number, Tile>) => {
@@ -172,10 +249,7 @@ function App(): JSX.Element {
       </div>
       <div style={{ position: "fixed", backgroundColor: "#0000005A", bottom: 0, width: "100%", padding: "12px", display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
         {
-          !started ? <>
-            <div>{validMoves == 0 ? "A játék véget ért!" : null}</div>
-            <button onClick={startGame}>{validMoves == 0 ? "Új játék" : "Indítás"}</button>
-          </> : null
+          <button onClick={startGame}>Új játék</button>
         }
         {imgSource && <div><img src={imgSource} style={{ transform: `rotate(${rotate * 90}deg)` }} className='previewImage' onClick={(event: any) => imgRotation(event)} /></div>}
       </div>
