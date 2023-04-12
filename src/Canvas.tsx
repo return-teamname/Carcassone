@@ -235,7 +235,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, savedGames, vali
             />
           </>
           {
-            savedGames.sort((a, b) => (a.points.roads + a.points.cities + a.points.monas + a.points.others) - (b.points.roads + b.points.cities + b.points.monas + b.points.others)).map((item, index) =>
+            savedGames.sort((a, b) => (b.points.roads + b.points.cities + b.points.monas + b.points.others) - (a.points.roads + a.points.cities + a.points.monas + a.points.others)).map((item, index) =>
               <Text
                 position={[3.5, 2 - index, 0]}
                 text={`${item.username == "" ? "Ismeretlen" : item.username}: ${item.points.cities + item.points.monas + item.points.others + item.points.roads} pont`}
