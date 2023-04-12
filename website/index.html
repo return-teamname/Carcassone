@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="hu">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
     <title>Carcassone játék</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="content">
         <header>
@@ -18,13 +20,17 @@
         </header>
         <div id="rules">
             <h2>Játékszabályok</h2>
-            <p>A játékot egy játékos játssza. A gép véletlenszerűen kiválaszt egy területkártyát amit a játékosnak az alábbi szabályok szerint kell elhelyeznie.</p>
+            <p>A játékot egy játékos játssza. A gép véletlenszerűen kiválaszt egy területkártyát amit a játékosnak az
+                alábbi szabályok szerint kell elhelyeznie.</p>
             <ul>
                 <li>Az első kártyát tetszőleges mezőre lehet elhelyezni</li>
-                <li>A további kártyákat úgy kell lerakni, hogy legalább egy sarka érintkezzen egy vagy több már letett lap sarkával</li>
-                <li>Minden rét-, út-, városrésznek folytatódnia kell! Tehát a laphatáron rét csak réttel, város csak várossal érintkezhet és a kártya széléhez futó útnak is folytatódnia kell</li>
+                <li>A további kártyákat úgy kell lerakni, hogy legalább egy sarka érintkezzen egy vagy több már letett
+                    lap sarkával</li>
+                <li>Minden rét-, út-, városrésznek folytatódnia kell! Tehát a laphatáron rét csak réttel, város csak
+                    várossal érintkezhet és a kártya széléhez futó útnak is folytatódnia kell</li>
             </ul>
-            <p>A játék véget ér ha a játékos nem tud elhelyezni további kártyákat, vagy azért mert betelt a játéklap, vagy mert szabályok szerint nem tudja elhelyezni.</p>
+            <p>A játék véget ér ha a játékos nem tud elhelyezni további kártyákat, vagy azért mert betelt a játéklap,
+                vagy mert szabályok szerint nem tudja elhelyezni.</p>
             <h3>Pontozás</h3>
             <ul>
                 <li>A városok értéke annyiszor 2 pont, ahány kártyából áll.</li>
@@ -38,28 +44,70 @@
         <div id="progexp">
             <div>
                 <h2>A program működése</h2>
-                <p>A program első betöltődése során megjelenik előttünk az üres játéktér, és egy gomb, amivel elindíthatjuk a játékot. (1. ábra)</p>
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra1.png" alt="Játék példa">
+                        <figcaption>1. ábra</figcaption>
+                    </figure>
+                    <p>A program első betöltődése során megjelenik előttünk az üres játéktér, és egy gomb, amivel
+                        elindíthatjuk a játékot. (1. ábra)</p>
+                </div>
 
-                <p>Ekkor véletlenszerűen megjelenik előttünk egy kártya, amire kattintva lehetőségünk van elforgatni. (2. ábra)</p>
-                <p>A kártyákat a játéktéren megjelenő csempékre van lehetőségünk elhelyezni. Az első kártyát tetszőleges helyre. A többi kártyát, már csak a lerakott csempék mellé tehetünk le. A program jelzi nekünk azt is, hogy mennyi lehetséges lerakási hely van, valamint a játéktéren is láthatjuk, hogy hova lehet elhelyezni az éppen aktuális kártyát. (3. ábra)</p>
-                <p>A játék közben láthatjuk a játéktér mellett a jelenlegi pontszámokat. (4. ábra)</p>
-                <p>Amennyiben véget ér a játék, lehetőségünk van a pontszámot elmenteni névvel együtt. (5. ábra)</p>
-                <p>A játék különlegessége, hogy 3 dimenziós, így lehetőségünk van bármilyen pozícióból játszani a játékkal. Bal klikk hosszú lenyomásával forgatni tudjuk a játékteret, jobbb klikk hosszú lenyomásával a játékteret lehetőségünk van mozgatni, görgővel pedig nagyíthatunk és kicsinyíthetünk a játéktéren. (6. ábra)</p>
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra2.png" alt="Játék példa">
+                        <figcaption>2. ábra</figcaption>
+                    </figure>
+                    <p>Ekkor véletlenszerűen megjelenik előttünk egy kártya, amire kattintva lehetőségünk van
+                        elforgatni. (2. ábra)</p>
+                </div>
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra3.png" alt="Játék példa">
+                        <figcaption>3. ábra</figcaption>
+                    </figure>
+                    <p>A kártyákat a játéktéren megjelenő csempékre van lehetőségünk elhelyezni. Az első kártyát
+                        tetszőleges helyre. A többi kártyát, már csak a lerakott csempék mellé tehetünk le. A program
+                        jelzi nekünk azt is, hogy mennyi lehetséges lerakási hely van, valamint a játéktéren is
+                        láthatjuk, hogy hova lehet elhelyezni az éppen aktuális kártyát. (3. ábra)</p>
+                </div>
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra4.png" alt="Játék példa">
+                        <figcaption>4. ábra</figcaption>
+                    </figure>
+                    <p>A játék közben láthatjuk a játéktér mellett a jelenlegi pontszámokat is, valamint láthatjuk hogy mennyi lehetséges lerakási mód közül lehet választani. (4. ábra)</p>
+                </div>
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra5.png" alt="Játék példa">
+                        <figcaption>5. ábra</figcaption>
+                    </figure>
+                    <p>Amennyiben véget ér a játék, lehetőségünk van a pontszámot elmenteni névvel együtt. (5. ábra)</p>
+                </div>
+
+                <div class="prog-container">
+                    <figure>
+                        <img src="abra6.png" alt="Játék példa">
+                        <figcaption>6. ábra</figcaption>
+                    </figure>
+                    <p>A játék különlegessége, hogy 3 dimenziós, így lehetőségünk van bármilyen pozícióból játszani a
+                        játékkal. Bal klikk hosszú lenyomásával forgatni tudjuk a játékteret, jobbb klikk hosszú
+                        lenyomásával a játékteret lehetőségünk van mozgatni, görgővel pedig nagyíthatunk és
+                        kicsinyíthetünk
+                        a játéktéren. (6. ábra)</p>
+                </div>
+
+
             </div>
-            <div>
-                <figure>
-                    <img src="abra1.png" alt="Játék példa">
-                    <figcaption>1. ábra</figcaption>
-                </figure>
+
+        </div>
+        <footer>
+            <div class="footer-wrapper">
+                &copy; 2023 return teamname;
             </div>
-        </div>
-       
-    </div>
-    <footer>
-        <div class="footer-wrapper">
-            &copy; 2023 return teamname;
-        </div>
-    </footer>
-    <script src="main.js"></script>
+        </footer>
+        <script src="main.js"></script>
 </body>
+
 </html>

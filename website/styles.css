@@ -92,6 +92,43 @@ p{
     display: flex;
 }
 
+#progexp p{
+    font-size: 28px;
+    text-align: center;
+}
+
 #progexp img{
-    height: 400px;
+    width: 500px;
+}
+
+
+#progexp div.prog-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#progexp div.prog-container:nth-child(odd) figure{
+    order: 1;
+}
+
+#progexp div.prog-container:nth-child(even) figure{
+    order: 0;
+}
+
+
+figure{
+    display: inline-block;
+}
+
+@media(max-width: 984px){
+    header nav{
+        flex-direction: column;
+    }
+    #progexp div.prog-container{
+        flex-direction: column;
+    }
+    #progexp div.prog-container:nth-child(odd) figure{
+        order: 0;
+    }
 }
