@@ -139,6 +139,7 @@ function App(): JSX.Element {
           cGame.username = name!;
         }
         setStarted(false);
+        localStorage.removeItem('current_save');
 
         if (cGame.username != "") {
           saveToGames(cGame);
