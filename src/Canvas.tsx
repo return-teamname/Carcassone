@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { Box, OrbitControls } from '@react-three/drei';
 import { Tile, TileType, getValidTileForSide } from './classes/tile';
 
-import { Points } from './App';
+import { Points, SavedGame } from './App';
 
 import { TextureLoader } from "three";
 
@@ -162,10 +162,11 @@ interface GridCanvasProps {
   currentTileKey: TileType;
   points: Points;
   validMoves: number;
+  savedGames: SavedGame[];
   onPlaced: (pos: [number, number, number]) => void;
 }
 
-const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
+const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, savedGames, validMoves, points, rotation, tileMap, currentTileKey, onPlaced, tiles, started }) => {
 
   const backgroundImageUrl = require("./assets/bg/carsonne_bg.jpeg");
 
@@ -226,7 +227,22 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ width, height, validMoves, poin
             position={[3.5, -3, 0]}
             text={`Lehetséges lerakások: ${validMoves == -1 ? width * height * 4 : validMoves}`}
           />
-        </> : null
+        </> : <>
+          <>
+            <Text
+              position={[3.5, 3, 0]}
+              text={`Scoreboard:`}
+            />
+          </>
+          {
+            savedGames.sort((a, b) => (a.points.roads + a.points.cities + a.points.monas + a.points.others) - (b.points.roads + b.points.cities + b.points.monas + b.points.others)).map((item, index) =>
+              <Text
+                position={[3.5, 2 - index, 0]}
+                text={`${item.username == "" ? "Ismeretlen" : item.username}: ${item.points.cities + item.points.monas + item.points.others + item.points.roads} pont`}
+              />
+            )
+          }
+        </>
       }
     </Canvas>
   );

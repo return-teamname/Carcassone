@@ -29,22 +29,20 @@ function App(): JSX.Element {
 
   const saveCurrentGame = (cGame: SavedGame) => {
     setCurrentGame(cGame);
-    console.log("saving game", cGame, JSON.stringify(cGame));
     localStorage.setItem('current_save', JSON.stringify(cGame));
   }
 
   const saveToGames = (cGame: SavedGame) => {
     const cSave = [...savedGames, cGame];
     setSavedGames(cSave);
-    console.log("saving to games", cSave, savedGames);
     localStorage.setItem('saved_games', JSON.stringify(cSave));
   }
 
   useEffect(() => {
     const cSavedGames = localStorage.getItem('saved_games');
     if (cSavedGames) {
-      console.log("loading all saved games");
-      setSavedGames(JSON.parse(cSavedGames));
+      const p = JSON.parse(cSavedGames);
+      setSavedGames(p);
     }
 
     const currentSave = localStorage.getItem('current_save');
@@ -53,7 +51,6 @@ function App(): JSX.Element {
       const p = JSON.parse(currentSave);
       var s = new Map<number, Tile>();
       const values = Object.values(JSON.parse(p.tiles));
-      console.log(values);
       Object.keys(JSON.parse(p.tiles)).forEach((key, value) => {
         s.set(parseInt(key), new Tile((values[value] as Tile).type, (values[value] as Tile).pos));
       });
@@ -61,6 +58,8 @@ function App(): JSX.Element {
       setPoints(p.points);
       setCurrentGame(JSON.parse(currentSave));
       makeCheck(s);
+
+      saveToGames(p);
     }
   }, []);
 
@@ -107,6 +106,11 @@ function App(): JSX.Element {
     //event.target.style.transform = `rotate(${newRotation * 90}deg)`
   }
 
+  const clearSaves = () => {
+    localStorage.removeItem("saved_games");
+    setSavedGames([]);
+  }
+
   const makeCheck = (newTiles: Map<number, Tile>) => {
     const p = countPoints(newTiles);
 
@@ -135,13 +139,14 @@ function App(): JSX.Element {
           cGame.username = name!;
         }
         setStarted(false);
-      }, 1000)
+
+        if (cGame.username != "") {
+          saveToGames(cGame);
+        };
+      }, 1000);
     }
 
     saveCurrentGame(cGame);
-    if (cGame.username != "") {
-      saveToGames(cGame);
-    };
   }
 
   const onPlaced = (pos: [number, number, number]) => {
@@ -245,13 +250,17 @@ function App(): JSX.Element {
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <div style={{ width: '100vw', height: '100vh' }}>
-        <NewGridCanvas validMoves={validMoves} points={points} currentTileKey={currentTileKey!} tileMap={validTileMap} width={width} height={height} onPlaced={onPlaced} started={started} rotation={rotate} tiles={tiles} />
+        <NewGridCanvas savedGames={savedGames} validMoves={validMoves} points={points} currentTileKey={currentTileKey!} tileMap={validTileMap} width={width} height={height} onPlaced={onPlaced} started={started} rotation={rotate} tiles={tiles} />
       </div>
       <div style={{ position: "fixed", backgroundColor: "#0000005A", bottom: 0, width: "100%", padding: "12px", display: "flex", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
         {
           <button onClick={startGame}>Új játék</button>
         }
         {imgSource && <div><img src={imgSource} style={{ transform: `rotate(${rotate * 90}deg)` }} className='previewImage' onClick={(event: any) => imgRotation(event)} /></div>}
+        {
+          savedGames.length != 0 ?
+            <button onClick={clearSaves}>Mentések törlése</button> : null
+        }
       </div>
     </div>
   );
