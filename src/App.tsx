@@ -58,8 +58,6 @@ function App(): JSX.Element {
       setPoints(p.points);
       setCurrentGame(JSON.parse(currentSave));
       makeCheck(s);
-
-      saveToGames(p);
     }
   }, []);
 
