@@ -79,6 +79,11 @@ h3{
     font-size: 30px;
 }
 
+figcaption{
+    font-size: 18px;
+    font-style: italic
+}
+
 p{
     font-size: 20px;
 }
@@ -88,5 +93,5 @@ p{
 }
 
 #progexp img{
-    width: 400px;
+    height: 400px;
 }
